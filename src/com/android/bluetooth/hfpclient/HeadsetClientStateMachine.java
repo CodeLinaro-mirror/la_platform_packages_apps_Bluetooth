@@ -652,8 +652,13 @@ public class HeadsetClientStateMachine extends StateMachine {
         }
 
         if (flag == BluetoothHeadsetClient.CALL_ACCEPT_HOLD) {
-            // When unholding a call over Bluetooth make sure to route audio.
-            routeHfpAudio(true);
+            if (mAudioState == BluetoothHeadsetClient.STATE_AUDIO_CONNECTED) {
+                // When unholding a call over Bluetooth make sure to route audio.
+                routeHfpAudio(true);
+            } else {
+                // try to connect audio sco
+                sendMessage(HeadsetClientStateMachine.CONNECT_AUDIO);
+            }
         }
 
         if (mNativeInterface.handleCallAction(getByteAddress(mCurrentDevice), action, 0)) {
